@@ -1,7 +1,8 @@
 package edp.wormhole.flinkx.udf
 
 import edp.wormhole.flinkx.util.FlinkSchemaUtils
-import org.apache.flink.table.api.scala.StreamTableEnvironment
+import org.apache.flink.table.api.bridge.scala.StreamTableEnvironment
+//import org.apache.flink.table.api.scala.StreamTableEnvironment
 
 
 object UdfRegister {

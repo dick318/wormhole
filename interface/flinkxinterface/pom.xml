@@ -11,10 +11,14 @@
     </parent>
 
     <dependencies>
+
+        <!--2021.03.31添加新版flink依赖begin-->
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-table_${scala.binary.version}</artifactId>
+            <!--<artifactId>flink-table_${scala.binary.version}</artifactId>-->
+            <artifactId>flink-table</artifactId>
             <version>${flink.version}</version>
+            <type>pom</type>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
@@ -22,6 +26,28 @@
             <version>${flink.version}</version>
             <!--<version>1.5.SNAPSHOT</version>-->
         </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-api-scala-bridge_2.11</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-api-java-bridge_2.11</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-planner_${scala.binary.version}</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-planner-blink_${scala.binary.version}</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+        <!--2021.03.31添加新版flink依赖end-->
+
     </dependencies>
 
     <artifactId>wormhole-flinkxinterface</artifactId>

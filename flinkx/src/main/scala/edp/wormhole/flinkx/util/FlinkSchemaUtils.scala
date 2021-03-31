@@ -32,7 +32,9 @@ import edp.wormhole.ums.UmsProtocolType.{DATA_BATCH_DATA, DATA_INCREMENT_DATA, D
 import edp.wormhole.ums.{UmsCommonUtils, UmsSchema, UmsSysField}
 import edp.wormhole.util.DateUtils
 import org.apache.flink.api.common.typeinfo.{BasicArrayTypeInfo, SqlTimeTypeInfo, TypeInformation}
-import org.apache.flink.table.api.{TableSchema, Types}
+import org.apache.flink.table.api.TableSchema
+//import org.apache.flink.table.api.Types
+import org.apache.flink.api.common.typeinfo.Types
 import org.apache.flink.table.typeutils.TimeIndicatorTypeInfo
 import org.apache.kafka.clients.consumer.{ConsumerRecord, ConsumerRecords}
 import org.apache.log4j.Logger
@@ -239,7 +241,7 @@ object FlinkSchemaUtils extends java.io.Serializable {
       case BOOLEAN => Types.BOOLEAN
       case DATE => Types.SQL_DATE
       case DATETIME => Types.SQL_TIMESTAMP
-      case DECIMAL => Types.DECIMAL
+      case DECIMAL => Types.BIG_DEC
     }
   }
 
@@ -253,7 +255,7 @@ object FlinkSchemaUtils extends java.io.Serializable {
       case Types.BOOLEAN => BOOLEAN
       case Types.SQL_DATE => DATE
       case Types.SQL_TIMESTAMP => DATETIME
-      case Types.DECIMAL => DECIMAL
+      case Types.BIG_DEC => DECIMAL
       //case _ => INT
     }
 
@@ -263,7 +265,7 @@ object FlinkSchemaUtils extends java.io.Serializable {
     fieldType match {
       case "datetime" => Types.SQL_TIMESTAMP
       case "date" => Types.SQL_DATE
-      case "decimal" => Types.DECIMAL
+      case "decimal" => Types.BIG_DEC
       case "int" => Types.INT
       case "long" => Types.LONG
       case "float" => Types.FLOAT
@@ -295,7 +297,7 @@ object FlinkSchemaUtils extends java.io.Serializable {
       case _=>DateUtils.dt2sqlDate(value.asInstanceOf[Date])
     }
     case Types.SQL_TIMESTAMP => value.asInstanceOf[Timestamp]
-    case Types.DECIMAL => new java.math.BigDecimal(value.asInstanceOf[java.math.BigDecimal].stripTrailingZeros().toPlainString)
+    case Types.BIG_DEC => new java.math.BigDecimal(value.asInstanceOf[java.math.BigDecimal].stripTrailingZeros().toPlainString)
     case _ => throw new UnsupportedOperationException(s"Unknown Type: $flinkType")
   }
 
@@ -309,7 +311,7 @@ object FlinkSchemaUtils extends java.io.Serializable {
     case Types.BOOLEAN => value.trim.toBoolean
     case Types.SQL_DATE => DateUtils.dt2sqlDate(value.trim)
     case Types.SQL_TIMESTAMP => DateUtils.dt2timestamp(value.trim)
-    case Types.DECIMAL => new java.math.BigDecimal(value.trim).stripTrailingZeros()
+    case Types.BIG_DEC => new java.math.BigDecimal(value.trim).stripTrailingZeros()
     case _ => throw new UnsupportedOperationException(s"Unknown Type: $flinkType")
   }
 

@@ -30,7 +30,8 @@ import edp.wormhole.flinkx.util.FlinkSchemaUtils.{object2TrueValue, s2TrueValue}
 import edp.wormhole.ums.UmsProtocolType
 import edp.wormhole.util.DateUtils.{dt2sqlDate, dt2timestamp}
 import org.apache.flink.api.common.typeinfo.TypeInformation
-import org.apache.flink.table.api.Types
+//import org.apache.flink.table.api.Types
+import org.apache.flink.api.common.typeinfo.Types
 import org.apache.flink.types.Row
 
 import scala.collection.Map
@@ -91,7 +92,7 @@ class PatternCondition(schemaMap: Map[String, (TypeInformation[_], Int)],excepti
         case Types.LONG => rowFieldValue.asInstanceOf[Long] > compareValue.toLong
         case Types.FLOAT => rowFieldValue.asInstanceOf[Float] > compareValue.toFloat
         case Types.DOUBLE => rowFieldValue.asInstanceOf[Double] > compareValue.toDouble
-        case Types.DECIMAL => new java.math.BigDecimal(value).stripTrailingZeros().compareTo(new java.math.BigDecimal(compareValue).stripTrailingZeros()) > 0
+        case Types.BIG_DEC => new java.math.BigDecimal(value).stripTrailingZeros().compareTo(new java.math.BigDecimal(compareValue).stripTrailingZeros()) > 0
         case Types.SQL_DATE => dt2sqlDate(value).compareTo(dt2sqlDate(compareValue)) > 0
         case Types.SQL_TIMESTAMP => dt2timestamp(value).compareTo(dt2timestamp(compareValue)) > 0
       }
@@ -101,7 +102,7 @@ class PatternCondition(schemaMap: Map[String, (TypeInformation[_], Int)],excepti
         case Types.LONG => rowFieldValue.asInstanceOf[Long] < compareValue.toLong
         case Types.FLOAT => rowFieldValue.asInstanceOf[Float] < compareValue.toFloat
         case Types.DOUBLE => rowFieldValue.asInstanceOf[Double] < compareValue.toDouble
-        case Types.DECIMAL => new java.math.BigDecimal(value).stripTrailingZeros().compareTo(new java.math.BigDecimal(compareValue).stripTrailingZeros()) < 0
+        case Types.BIG_DEC => new java.math.BigDecimal(value).stripTrailingZeros().compareTo(new java.math.BigDecimal(compareValue).stripTrailingZeros()) < 0
         case Types.SQL_DATE => dt2sqlDate(value).compareTo(dt2sqlDate(compareValue)) < 0
         case Types.SQL_TIMESTAMP => dt2timestamp(value).compareTo(dt2timestamp(compareValue)) < 0
       }
@@ -111,7 +112,7 @@ class PatternCondition(schemaMap: Map[String, (TypeInformation[_], Int)],excepti
         case Types.LONG => rowFieldValue.asInstanceOf[Long] >= compareValue.toLong
         case Types.FLOAT => rowFieldValue.asInstanceOf[Float] >= compareValue.toFloat
         case Types.DOUBLE => rowFieldValue.asInstanceOf[Double] >= compareValue.toDouble
-        case Types.DECIMAL => new java.math.BigDecimal(value).stripTrailingZeros().compareTo(new java.math.BigDecimal(compareValue).stripTrailingZeros()) >= 0
+        case Types.BIG_DEC => new java.math.BigDecimal(value).stripTrailingZeros().compareTo(new java.math.BigDecimal(compareValue).stripTrailingZeros()) >= 0
         case Types.SQL_DATE => dt2sqlDate(value).compareTo(dt2sqlDate(compareValue)) >= 0
         case Types.SQL_TIMESTAMP => dt2timestamp(value).compareTo(dt2timestamp(compareValue)) >= 0
       }
@@ -121,7 +122,7 @@ class PatternCondition(schemaMap: Map[String, (TypeInformation[_], Int)],excepti
         case Types.LONG => rowFieldValue.asInstanceOf[Long] <= compareValue.toLong
         case Types.FLOAT => rowFieldValue.asInstanceOf[Float] <= compareValue.toFloat
         case Types.DOUBLE => rowFieldValue.asInstanceOf[Double] <= compareValue.toDouble
-        case Types.DECIMAL => new java.math.BigDecimal(value).stripTrailingZeros().compareTo(new java.math.BigDecimal(compareValue).stripTrailingZeros()) <= 0
+        case Types.BIG_DEC => new java.math.BigDecimal(value).stripTrailingZeros().compareTo(new java.math.BigDecimal(compareValue).stripTrailingZeros()) <= 0
         case Types.SQL_DATE => dt2sqlDate(value).compareTo(dt2sqlDate(compareValue)) <= 0
         case Types.SQL_TIMESTAMP => dt2timestamp(value).compareTo(dt2timestamp(compareValue)) <= 0
       }

@@ -32,14 +32,18 @@ import org.apache.flink.api.common.time.Time
 import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.cep.scala.CEP
 import org.apache.flink.streaming.api.scala.{DataStream, _}
-import org.apache.flink.table.api.scala.{StreamTableEnvironment, _}
-import org.apache.flink.table.api.{StreamQueryConfig, Table, Types}
+import org.apache.flink.table.api.bridge.scala._
+import org.apache.flink.table.api.{Table, TableConfig, Types}
 import org.apache.flink.table.expressions.{Expression, ExpressionParser}
 import org.apache.flink.types.Row
 import org.slf4j.{Logger, LoggerFactory}
-import scala.collection.Map
 
+import java.util
+import java.util.List
+import scala.collection.JavaConverters._
+import scala.collection.{JavaConverters, Map}
 
+//2021.03.31 这个文件修改较多，版本写法不一样
 class SwiftsProcess(dataStream: DataStream[Row],
                     exceptionConfig: ExceptionConfig,
                     tableEnv: StreamTableEnvironment,
@@ -69,7 +73,7 @@ class SwiftsProcess(dataStream: DataStream[Row],
   }
 
   private def doFlinkSql(transformedStream: DataStream[Row], sql: String, index: Int): DataStream[Row] = {
-    var table: Table = getKeyByStream(transformedStream).toTable(tableEnv, buildExpression(): _*)
+    var table: Table = getKeyByStream(transformedStream).toTable(tableEnv, JavaConverters.asScalaIteratorConverter(buildExpression().iterator()).asScala.toSeq:_*)
     table.printSchema()
     val projectClause = sql.substring(0, sql.toLowerCase.indexOf(" from ")).trim
     val namespaceTable = exceptionConfig.sourceNamespace.split("\\.")(3)
@@ -90,7 +94,7 @@ class SwiftsProcess(dataStream: DataStream[Row],
     else transformedStream
   }
 
-  private def buildExpression(): List[Expression] = {
+  private def buildExpression(): util.List[Expression] = {
     val originalSchema = preSchemaMap.toList.sortBy(_._2._2).map(_._1)
     if (timeCharacteristic == FlinkxTimeCharacteristicConstants.PROCESSING_TIME)
       ExpressionParser.parseExpressionList(originalSchema.mkString(",") + s", ${FlinkxTimeCharacteristicConstants.PROCESSING_TIME}.proctime")
@@ -106,7 +110,8 @@ class SwiftsProcess(dataStream: DataStream[Row],
     if (null != specialConfigObj && specialConfigObj.containsKey(FlinkxSwiftsConstants.PRESERVE_MESSAGE_FLAG) && specialConfigObj.getBooleanValue(FlinkxSwiftsConstants.PRESERVE_MESSAGE_FLAG)) {
       val columnNamesWithMessageFlag: Array[String] = columnNames ++ Array(FlinkxSwiftsConstants.MESSAGE_FLAG)
       val columnTypesWithMessageFlag: Array[TypeInformation[_]] = columnTypes ++ Array(Types.BOOLEAN)
-      val resultDataStream = table.toRetractStream[Row](getQueryConfig).map(tuple => {
+      getQueryConfig
+      val resultDataStream = table.toRetractStream[Row].map(tuple => {
         val rowWithMessageFlag = new Row(columnNames.length + 1)
         for (i <- columnNames.indices) {
           rowWithMessageFlag.setField(i, tuple._2.getField(i))
@@ -117,15 +122,17 @@ class SwiftsProcess(dataStream: DataStream[Row],
       println(resultDataStream.dataType.toString + "in  doFlinkSql")
       resultDataStream
     } else {
-      table.toRetractStream[Row](getQueryConfig).filter(_._1).map(_._2)(Types.ROW(columnNames, columnTypes))
+      getQueryConfig
+      table.toRetractStream[Row].filter(_._1).map(_._2)(Types.ROW(columnNames, columnTypes))
     }
   }
 
-  private def getQueryConfig: StreamQueryConfig = {
+  private def getQueryConfig: TableConfig = {
     val minIdleStateRetentionTime = if (null != specialConfigObj && specialConfigObj.containsKey(FlinkxSwiftsConstants.MIN_IDLE_STATE_RETENTION_TIME)) specialConfigObj.getLongValue(FlinkxSwiftsConstants.MIN_IDLE_STATE_RETENTION_TIME) else 12L
     val maxIdleStateRetentionTime = if (null != specialConfigObj && specialConfigObj.containsKey(FlinkxSwiftsConstants.MAX_IDLE_STATE_RETENTION_TIME)) specialConfigObj.getLongValue(FlinkxSwiftsConstants.MAX_IDLE_STATE_RETENTION_TIME) else 24L
-    val queryConfig = tableEnv.queryConfig
-    queryConfig.withIdleStateRetentionTime(Time.hours(minIdleStateRetentionTime), Time.hours(maxIdleStateRetentionTime))
+    val queryConfig = tableEnv.getConfig
+    queryConfig.setIdleStateRetentionTime(Time.hours(minIdleStateRetentionTime), Time.hours(maxIdleStateRetentionTime))
+    queryConfig
   }
 
   private def doCEP(transformedStream: DataStream[Row], sql: String, index: Int): DataStream[Row] = {

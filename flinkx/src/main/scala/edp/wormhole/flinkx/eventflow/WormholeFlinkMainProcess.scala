@@ -23,7 +23,6 @@ package edp.wormhole.flinkx.eventflow
 import java.sql.Timestamp
 import java.util.concurrent.TimeUnit
 import java.util.{Properties, TimeZone}
-
 import com.alibaba.fastjson
 import com.alibaba.fastjson.{JSON, JSONObject}
 import edp.wormhole.common.feedback.FeedbackPriority
@@ -53,8 +52,10 @@ import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrderness
 import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment, _}
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.api.{CheckpointingMode, TimeCharacteristic}
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010
-import org.apache.flink.table.api.scala.StreamTableEnvironment
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
+import org.apache.flink.table.api.EnvironmentSettings
+//import org.apache.flink.table.api.scala.StreamTableEnvironment
+import org.apache.flink.table.api.bridge.scala.StreamTableEnvironment
 import org.apache.flink.table.api.{TableEnvironment, Types}
 import org.apache.flink.types.Row
 import org.apache.log4j.Logger
@@ -94,8 +95,17 @@ class WormholeFlinkMainProcess(config: WormholeFlinkxConfig, umsFlowStart: Ums) 
     val parallelism = UmsFlowStartUtils.extractParallelism(flowConfig)
     env.setParallelism(parallelism)
     manageCheckpoint(env, UmsFlowStartUtils.extractCheckpointConfig(config.commonConfig, flowConfig))
-    val tableEnv = TableEnvironment.getTableEnvironment(env)
-    tableEnv.config.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"))
+
+    //2021.03.31修改新版写法，注意设置时区的方法没了，需要观察是否有影响
+    val settings: EnvironmentSettings = EnvironmentSettings.newInstance()
+      .useAnyPlanner()
+      .inStreamingMode()
+      .build()
+    val tableEnv: StreamTableEnvironment = StreamTableEnvironment.create(env, settings)
+
+//    val tableEnv = TableEnvironment.getTableEnvironment(env)
+//    tableEnv.config.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"))
+
     udfRegister(tableEnv)
     assignTimeCharacteristic(env)
 
@@ -154,7 +164,7 @@ class WormholeFlinkMainProcess(config: WormholeFlinkxConfig, umsFlowStart: Ums) 
     }
     val flinkxConfigUtils = new WormholeFlinkxConfigUtils(config)
     val topics = flinkxConfigUtils.getKafkaTopicList
-    val myConsumer = new FlinkKafkaConsumer010[(String, String, String, Int, Long)](topics, new WormholeDeserializationStringSchema, properties)
+    val myConsumer = new FlinkKafkaConsumer[(String, String, String, Int, Long)](topics, new WormholeDeserializationStringSchema, properties)
 
     val specificStartOffsets = flinkxConfigUtils.getTopicPartitionOffsetMap
     myConsumer.setStartFromSpecificOffsets(specificStartOffsets)

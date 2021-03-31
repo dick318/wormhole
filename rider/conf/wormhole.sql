@@ -489,6 +489,7 @@ CREATE TABLE IF NOT EXISTS `feedback_flow_stats` (
 
 alter table `feedback_flow_stats` add column `project_id` BIGINT NOT NULL after `id`;
 alter table `feedback_flow_stats` modify column `batch_id` varchar(100);
+alter table `feedback_flow_stats` modify column `topics` varchar(2000) NOT NULL;
 
 CREATE TABLE IF NOT EXISTS `feedback_error` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,

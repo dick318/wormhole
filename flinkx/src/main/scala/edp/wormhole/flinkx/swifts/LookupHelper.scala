@@ -30,7 +30,8 @@ import edp.wormhole.util.CommonUtils
 import edp.wormhole.util.config.ConnectionConfig
 import edp.wormhole.util.swifts.SwiftsSql
 import org.apache.flink.api.common.typeinfo.TypeInformation
-import org.apache.flink.table.api.Types
+//import org.apache.flink.table.api.Types
+import org.apache.flink.api.common.typeinfo.Types
 import org.apache.flink.types.Row
 import org.apache.log4j.Logger
 

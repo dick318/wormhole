@@ -12,7 +12,7 @@ object JsonParseHelper {
     val size = subFields.size()
     for (i <- 0 until size) {
       val jsonObj = subFields.getJSONObject(i)
-      val name = jsonObj.getString("name")
+      val name = jsonObj.getString("name").toLowerCase
       val dataType = jsonObj.getString("type")
       if (schemaMap.contains(name)) {
         val subFields: Option[JSONArray] = if (jsonObj.containsKey("sub_fields")) Some(jsonObj.getJSONArray("sub_fields")) else None

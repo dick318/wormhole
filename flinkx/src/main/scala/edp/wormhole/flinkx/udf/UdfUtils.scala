@@ -4,7 +4,8 @@ import java.lang.reflect.Method
 
 import edp.wormhole.flinkx.udf.UdafRegister.logger
 import org.apache.flink.api.common.typeinfo.{BasicArrayTypeInfo, TypeInformation}
-import org.apache.flink.table.api.Types
+//import org.apache.flink.table.api.Types
+import org.apache.flink.api.common.typeinfo.Types
 
 import scala.collection.mutable
 
@@ -46,7 +47,7 @@ object UdfUtils {
       case "boolean" => Types.BOOLEAN
       case "java.lang.Boolean" => Types.BOOLEAN
       case "java.lang.String" => Types.STRING
-      case "java.math.BigDecimal" => Types.DECIMAL
+      case "java.math.BigDecimal" => Types.BIG_DEC
       case "java.util.Date" => Types.SQL_DATE
       case "java.sql.Date" => Types.SQL_DATE
       case "java.sql.Timestamp" => Types.SQL_TIMESTAMP

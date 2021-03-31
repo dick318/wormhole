@@ -1,8 +1,8 @@
 package edp.wormhole.flinkxinterface
 
-import org.apache.flink.table.functions.AggregateFunction
+import org.apache.flink.api.common.functions.AggregateFunction
 
-abstract class UdafInterface[T, ACC] extends AggregateFunction[T, ACC]{
+abstract class UdafInterface[IN, ACC, OUT] extends AggregateFunction[IN, ACC, OUT]{
 
   /**
     * Creates and init the Accumulator for this [[AggregateFunction]].
@@ -31,7 +31,7 @@ abstract class UdafInterface[T, ACC] extends AggregateFunction[T, ACC]{
     *                    aggregated results
     * @return the aggregation result
     */
-  def getValue(accumulator: ACC): T  // MANDATORY
+  def getValue(accumulator: ACC): OUT  // MANDATORY
 
 
   /**
