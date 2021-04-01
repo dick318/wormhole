@@ -96,15 +96,16 @@ class WormholeFlinkMainProcess(config: WormholeFlinkxConfig, umsFlowStart: Ums) 
     env.setParallelism(parallelism)
     manageCheckpoint(env, UmsFlowStartUtils.extractCheckpointConfig(config.commonConfig, flowConfig))
 
-    //2021.03.31修改新版写法，注意设置时区的方法没了，需要观察是否有影响
+    //2021.03.31修改新版写法
     val settings: EnvironmentSettings = EnvironmentSettings.newInstance()
       .useAnyPlanner()
       .inStreamingMode()
       .build()
     val tableEnv: StreamTableEnvironment = StreamTableEnvironment.create(env, settings)
+    tableEnv.getConfig.setLocalTimeZone(TimeZone.getTimeZone("Asia/Shanghai").toZoneId)
 
-//    val tableEnv = TableEnvironment.getTableEnvironment(env)
-//    tableEnv.config.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"))
+    //    val tableEnv = TableEnvironment.getTableEnvironment(env)
+    //    tableEnv.config.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"))
 
     udfRegister(tableEnv)
     assignTimeCharacteristic(env)
